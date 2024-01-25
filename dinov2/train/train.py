@@ -1,4 +1,4 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
+    # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the license found in the
@@ -19,7 +19,7 @@ import math
 import os
 from functools import partial
 import wandb
-#os.environ["WANDB_MODE"]="offline" #use this so set wandb to offline mode
+os.environ["WANDB_MODE"]="offline" #use this so set wandb to offline mode
 
 from fvcore.common.checkpoint import PeriodicCheckpointer
 import torch
@@ -41,7 +41,7 @@ logger = logging.getLogger("dinov2")
 
 def get_args_parser(add_help: bool = True):
     parser = argparse.ArgumentParser("DINOv2 training", add_help=add_help)
-    parser.add_argument("--config-file", default="/home/aih/benedikt.roth/dinov2/dinov2/configs/ssl_default_config.yaml", metavar="FILE", help="path to config file")
+    parser.add_argument("--config-file", default="/home/carlos.hernandez/PhD/dinov2/dinov2/configs/ssl_default_config.yaml", metavar="FILE", help="path to config file")
     parser.add_argument(
         "--no-resume",
         action="store_true",
@@ -138,8 +138,11 @@ def do_test(cfg, model, iteration):
     state_dict_student_dino_head = model.student.dino_head.state_dict()
 
     if distributed.is_main_process():
-        iterstring = str(iteration)
+        iterstring = str(iteration + 1) + '_' + wandb.run.name
+        # Update the save path with the run name as a subdirectory
+        
         eval_dir = os.path.join(cfg.train.output_dir, "eval", iterstring)
+
         os.makedirs(eval_dir, exist_ok=True)
         # save teacher checkpoint
         teacher_ckp_path = os.path.join(eval_dir, "teacher_checkpoint.pth")
@@ -226,6 +229,7 @@ def do_train(cfg, model, resume=False): # change resume to true?
     sampler_type = SamplerType.INFINITE
     #sampler_type = SamplerType.SHARDED_INFINITE
     #sampler_type = SamplerType.EPOCH
+    
     data_loader = make_data_loader(
         dataset=dataset,
         batch_size=cfg.train.batch_size_per_gpu,

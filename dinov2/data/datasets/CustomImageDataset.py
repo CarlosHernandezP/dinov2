@@ -26,7 +26,10 @@ def save_image(tensor, name1, name2):
     file_name = f'{name1}_{name2}.png'
     
     # Specify the save path with the concatenated file name
-    save_path = f'/home/ubuntu/example_image/augmented_images/{file_name}'
+    save_dir = '/home/carlos.hernandez/example_image/augmented_images/'
+    save_path = f'/home/carlos.hernandez/example_image/augmented_images/{file_name}'
+    os.makedirs(os.path.dirname(save_dir), exist_ok=True)
+
     
     # Save the image
     tensor.save(save_path)
@@ -68,7 +71,7 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         try:
-            img_path = self.img_labels.iloc[idx, 0]
+            img_path = self.img_labels['FilePath'].iloc[idx]
             with open(img_path, mode="rb") as f:
                 image_pil = f.read()
             image_pil = ImageDataDecoder(image_pil).decode()
